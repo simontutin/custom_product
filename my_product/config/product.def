@@ -1,0 +1,10 @@
+template_product_config config_product
+
+title
+	Template Product configuration product
+end
+
+description
+	Template Product configuration product
+end
+

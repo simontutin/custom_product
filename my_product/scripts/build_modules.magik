@@ -1,0 +1,28 @@
+_proc @build()
+
+	_local ok? << _false
+	_protect
+
+		_handling error _with _proc(c)
+					      c.report_on(!output!, _false)
+		                      _endproc
+
+		# Start a swaf session
+		start_session( :sw_core, :swaf )
+		
+		my_product << smallworld_product.add_product( system.getenv("MY_PRODUCT_DIR") )
+
+		write( "compile my_product" )
+		my_product.compile_all_modules()
+		my_product.compile_messages()
+		my_product.compile_module_messages()
+		
+		write( "serialise my_product and modules" )
+		my_product.save_serialised_module_definitions()
+		
+		ok? << _true
+	_protection
+		quit(ok?)
+	_endprotect
+_endproc()
+$

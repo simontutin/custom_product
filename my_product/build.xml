@@ -1,0 +1,67 @@
+<project name="Template Product Application" default="installer"
+	 xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:if="ant:if" xmlns:unless="ant:unless">
+
+  <property environment="env"/>
+
+  <property name="core.product.dir"         location="C:\Smallworld\core"/>
+  <property name="my_product.dir"           location="${ant.file}/.."/>
+  <property name="build.area"               location="${my_product.dir}\build"/>
+  <property name="packaging.dir"            location="${build.area}/installed"/>
+  <property name="installer.zip"            location="${build.area}/output/my_product.zip"/>
+  
+  <property name="helper.script"            location="${my_product.dir}\ant_helper.xml"/>
+  <import file="${helper.script}"/>
+
+  <target name="local-properties">
+    <echo message="core.product.dir:            ${core.product.dir}"/>
+    <echo message="build.area:                  ${build.area}"/>
+    <echo message="my_product.dir:              ${my_product.dir}"/>
+    <echo message="packaging.dir:               ${packaging.dir}"/>
+    <echo message="installer.zip:               ${installer.zip}"/>
+  </target>
+
+
+  <target name="compile-magik-task">
+    	<launch-magik
+	    dir="${core.product.dir}"
+	    environment-file="${core.product.dir}\config\environment.bat"
+	    alias-file="${core.product.dir}/config/gis_aliases"
+	    alias="swaf"
+	    outputlog="${build.area}\logs\output.log"
+	    errorlog="${build.area}\logs\error.log"
+	    testfile="${my_product.dir}\scripts\build_modules.magik"
+	    timeout="3600000">  <!-- 1 hour -->
+	  <env key="MY_PRODUCT_DIR" value="${my_product.dir}"/>
+	</launch-magik>
+  </target>
+
+  <!-- Installer build -->
+  <target name="installer-build-task">
+    <copy file="product.def" todir="${packaging.dir}/my_product"/>
+    <copy  todir="${packaging.dir}/my_product/libs">
+      <fileset dir="${my_product.dir}/libs"/>
+    </copy>
+    <copy  todir="${packaging.dir}/my_product/config">
+      <fileset dir="${my_product.dir}/config"/>
+    </copy>
+    <copy  todir="${packaging.dir}/my_product/modules">
+      <fileset dir="${my_product.dir}/modules" excludes="**/source/**, **/load_list.txt"/>  
+    </copy>
+
+    <zip destfile="${installer.zip}">
+	<zipfileset dir="${packaging.dir}"/>
+    </zip>
+  </target>
+
+  <target name="clean-up">
+    <delete dir="${build.area}\logs"/>
+    <delete dir="${build.area}\..\libs"/>
+    <delete dir="${build.area}\output"/>
+    <delete dir="${build.area}\installed"/>
+  </target>
+
+  <!-- Installer build -->
+  <target name="installer" depends="local-properties, clean-up, compile-magik-task, installer-build-task"/>
+  
+  
+</project>

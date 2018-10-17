@@ -1,0 +1,14 @@
+#
+# Smallworld Core Windows Platforms Standard Core Product Aliases
+#
+# The Smallworld Product's standard aliases file should not be edited
+# by hand.  A user can have personal aliases by placing them in a file
+# named `gis_aliases' in his/her home directory, but the alias names
+# must be chosen not to clash with those in the standard aliases file.
+#
+
+my_product:
+	title              = My Product
+	session            = my_product:demo
+	product            = my_product
+	args               = -cli

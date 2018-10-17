@@ -1,0 +1,46 @@
+<project name="Helper macrodefs" xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." xmlns:if="ant:if">
+
+
+<macrodef name="launch-magik">
+    <attribute name="dir" />
+    <attribute name="alias" />
+    <attribute name="alias-file"/>
+    <attribute name="environment-file" default="@{dir}\config\environment.bat"/>
+    <attribute name="testfile" />
+    <attribute name="outputlog" />
+    <attribute name="args" default=""/>
+    <attribute name="platform-dir" default="x86"/>
+    <attribute name="errorlog" />
+    <attribute name="timeout" default="600000"/> <!-- Default timeout 10 mins -->
+    <element name="environment" implicit="yes" optional="yes"/>
+    <sequential>
+      <mkdir dir="@{outputlog}/.." />
+      
+      <!-- USE CMD TO RUN GIS.EXE CAN'T GET GIS.EXE TO RUN DIRECT -->
+      <exec dir="@{dir}\bin\@{platform-dir}" executable="@{dir}\bin\@{platform-dir}\runalias" failonerror="true" timeout="@{timeout}">
+	<redirector output="@{outputlog}" error="@{errorlog}" alwayslog="true"/>
+	<arg value="-j"/>
+	<arg value="-Dmagik.command=&quot;load_file('@{testfile}');&quot;"/>
+	<arg value="-e"/>
+	<arg value="@{environment-file}"/>
+	<arg value="-a"/>
+	<arg value="@{alias-file}"/>
+	<arg value="@{alias}"/>
+	<arg line="@{args}"/>
+	<arg value="-cli"/>
+	<env key="MOJ_NO_PAUSE_ON_DIE" value="1"/>
+	<environment/>
+      </exec>
+      
+      <fail message="Errors found... tests failed. Refer to output and error log files @{outputlog} and @{errorlog} for details.">
+	  <condition>
+	      <or>
+		  <resourcecontains resource="@{outputlog}" substring="FAILURES!!!" casesensitive="false" />
+		  <resourcecontains resource="@{errorlog}"  substring="FAILURES!!!" casesensitive="false" />
+	      </or>
+	  </condition>
+      </fail>
+    </sequential>
+  </macrodef>  
+
+</project>
